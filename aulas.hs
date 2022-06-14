@@ -1,3 +1,28 @@
+-- Aulas já completamente entendidas
+{--
+  Lambda Cálculo
+  Introdução à Linguagem Haskell
+  Listas em Haskell
+  Avaliação Preguiçosa
+  Funções de Ordem Superior
+  Tipos de Dados Algébricos
+  Tipos Paramétricos
+  Polimorfismo em Haskell
+--}
+
+
+-- Aulas não completamente entendidas
+{--
+  Functores
+  Classes de Tipo Applicative
+  A Classe de Tipos Monad
+  Noção de Entrada e Saída em Haskell
+  Mônada e a Notação Do
+  Ideia de Mônada de Estado
+--}
+
+
+
 -- Exemplos de funções já implementadas em Haskell
 
 my_concat [] ys = ys
