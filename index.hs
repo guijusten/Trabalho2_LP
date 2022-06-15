@@ -1,6 +1,5 @@
 -- Guilherme Fiorini Justen - 201965041AC
 
-
 data Password = Password {
   v1 :: Int,
   v2 :: Int,
@@ -36,18 +35,22 @@ main = do
     if deNovo == "claro" then main else return ()
 
 
+-- fmap (fmap (*) [4,3,2,1]) [1..4]
+
 loop = do
     let p = Password 1 2 3 4
-    let parcial_hits = 0
-    let full_hits = 0
     input <- getInput
     
     -- listInput é o input do usuário, só que no formato [Int]
     let listInput = map read $ words input :: [Int]
 
-    putStrLn ("The input is: " ++ show listInput)
-    let v11 = v1 p
-    putStrLn ("v1 is: " ++ show v11)
+    let full_hits = length (filter (True==) (zipWith (==) [3,1,3,1] listInput))
+    let parcial_hits = (length [x | x <- [3,1,3,1], elem x listInput]) - full_hits
+
+    putStrLn (" ")
+    putStrLn ("Partial Hits: " ++ show parcial_hits)
+    putStrLn ("Full Hits: " ++ show full_hits)
+    
     if input /= (getPassword p) then loop else return ()
 
 
