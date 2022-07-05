@@ -1,102 +1,82 @@
--- Guilherme Fiorini Justen - 201965041AC
+import Control.Monad (replicateM)
+import System.Random (randomRIO)
+import Data.Maybe
+import Data.List
 
-data Password = Password {
-  v1 :: Int,
-  v2 :: Int,
-  v3 :: Int,
-  v4 :: Int
-} deriving Show
-
--- Função para imprimir uma senha
-getPassword p = (show (v1 p) ++ " " ++ show (v2 p) ++ " " ++ show (v3 p) ++ " " ++ show (v4 p))
-
-getInput :: IO (String)
-getInput = do
+-- Função para pegar o input do usuário
+get_input :: IO (String)
+get_input = do
     putStr "? "
     input <- getLine
     return input
 
 
--- validate_input :: (Bool)
-validate_input input
-  | length input /= 4 = False
-  | otherwise = True
+-- Funções para pegar valores individuais da senha
+first_elt (x:xs) = x
+second_elt (x:x2:xs) = x2
+third_elt (x:x2:x3:xs) = x3
+forth_elt (x:x2:x3:x4:xs) = x4
 
 
+-- Loop principal da aplicação
 main :: IO ()
 main = do
-    let p = Password 1 2 3 4
     putStrLn " "
-    loop
+
+    -- Gerando senha aleatória
+    listPassword <- generate_password
+    
+    -- Chamando função loop para iniciar o jogo
+    counter <- loop listPassword 1
+
+    -- Quando o user vencer, ele sai de loop e é informado que venceu
     putStrLn " "
     putStrLn "Parabéns seu merda!!!!!!!"
+    putStrLn ("Você acertou em " ++ show counter ++ " rodadas.")
+
+    -- Checando se o user quer jogar de novo
     putStrLn "Vai jogar de novo, corno?"
     deNovo <- getLine
     if deNovo == "claro" then main else return ()
 
 
--- fmap (fmap (*) [4,3,2,1]) [1..4]
+loop :: [Int] -> Int -> IO (Int)
+loop listPassword counter = do
+  -- Pegando o input do user e transformando-o em [Int]
+  input <- get_input
+  let listInput = map read $ words input :: [Int]
 
-loop = do
-    let p = Password 1 2 3 4
-    input <- getInput
-    
-    -- listInput é o input do usuário, só que no formato [Int]
-    let listInput = map read $ words input :: [Int]
+  -- Calculando quantos acertos parciais e totais foram feitos
+  let fullHits = length (filter (True==) (zipWith (==) listPassword listInput))
 
-    let full_hits = length (filter (True==) (zipWith (==) [3,1,3,1] listInput))
-    let parcial_hits = (length [x | x <- [3,1,3,1], elem x listInput]) - full_hits
+  partialHitsAux <- get_partial_hits listPassword listInput
+  let partialHits =  4 - partialHitsAux - fullHits
 
-    putStrLn (" ")
-    putStrLn ("Partial Hits: " ++ show parcial_hits)
-    putStrLn ("Full Hits: " ++ show full_hits)
-    
-    if input /= (getPassword p) then loop else return ()
+  -- Printando informações ao user
+  putStrLn ("Partial Hits: " ++ show partialHits)
+  putStrLn ("Full Hits: " ++ show fullHits)
+  putStrLn (" ")
+
+  -- Verificando se o user acertou
+  if fullHits /= 4 then (loop listPassword (counter + 1)) else return counter
 
 
+get_partial_hits :: [Int] -> [Int] -> IO Int
+get_partial_hits password input = do
+  let aux1 = remove_elt (first_elt input) password
+  let aux2 = remove_elt (second_elt input) aux1
+  let aux3 = remove_elt (third_elt input) aux2
+  let aux4 = remove_elt (forth_elt input) aux3
 
-{-- 
-Pseudo-Code:
+  return (length aux4)
 
-main = do
-    Gerar Senha
 
-    while não acertou:
-        Pegar Input
-        If Input Válido:
-            Comparar Input com Senha
-            Mostrar Resultado para o User
-        Otherwise:
-            Indicar que Input não é Válido
-        
---}
+-- Função para gerar a senha aleatoriamente
+generate_password :: IO [Int]
+generate_password = replicateM 4 $ randomRIO (1,6)
 
-{--
-Problemas:
 
-Validate_Input:
-  O input deve ser do tipo List. Acho que se for de outro tipo o código quebra
-  Não consigo retornar o Bool dessa função, para que a função possa ser chamada na main 
---}
-
-{--
-Ideia:
-  Poderia criar uma estrutura de dados: data Password = Password Int Int Int Int.
-  Dessa forma, definir funções em cima dessa classe para fazer validações do input, e comparações do input com a senha gerada randomicamente.  
---}
-
-{-
-Considering Random Password
-
-import System.Random
-
-let p = Password (randomRIO (1,6::Int)) (randomRIO (1,6::Int)) (randomRIO (1,6::Int)) (randomRIO (1,6::Int))
-
--- Função que gera o código de quatro dígitos
-generate_password = sequence $ replicate 4 $ randomRIO (1,6::Int) >>= print
-
-generate_password = do
-  g <- getStdGen
-  print $ take 10 (randoms g :: [Int])
-
--}
+-- Função que remove um dado elemento de uma lista
+remove_elt _ [] = []
+remove_elt num (x:xs)  | num == x      = xs
+                       | otherwise = x : remove_elt num xs
