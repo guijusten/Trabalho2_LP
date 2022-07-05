@@ -1,7 +1,8 @@
+-- Guilherme Fiorini Justen
+-- 201965041AC
+
 import Control.Monad (replicateM)
 import System.Random (randomRIO)
-import Data.Maybe
-import Data.List
 
 -- Função para pegar o input do usuário
 get_input :: IO (String)
@@ -31,13 +32,12 @@ main = do
 
     -- Quando o user vencer, ele sai de loop e é informado que venceu
     putStrLn " "
-    putStrLn "Parabéns seu merda!!!!!!!"
-    putStrLn ("Você acertou em " ++ show counter ++ " rodadas.")
+    putStrLn ("Parabéns! Você acertou após " ++ show counter ++ " tentativas.")
 
     -- Checando se o user quer jogar de novo
-    putStrLn "Vai jogar de novo, corno?"
+    putStrLn "Para jogar de novo digite [1]. Caso contrário digite [2]"
     deNovo <- getLine
-    if deNovo == "claro" then main else return ()
+    if deNovo == "1" then main else return ()
 
 
 loop :: [Int] -> Int -> IO (Int)
@@ -53,8 +53,8 @@ loop listPassword counter = do
   let partialHits =  4 - partialHitsAux - fullHits
 
   -- Printando informações ao user
-  putStrLn ("Partial Hits: " ++ show partialHits)
-  putStrLn ("Full Hits: " ++ show fullHits)
+  putStrLn ("Acertos parciais: " ++ show partialHits)
+  putStrLn ("Acertos completos: " ++ show fullHits)
   putStrLn (" ")
 
   -- Verificando se o user acertou
