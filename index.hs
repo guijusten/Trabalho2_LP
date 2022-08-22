@@ -28,9 +28,8 @@ main = do
 
 game :: [Int] -> Int -> IO (Int)
 game listPassword counter = do
-  -- Pegando o input do user e transformando-o em [Int]
-  input <- get_input
-  let listInput = map read $ words input :: [Int]
+  -- Pegando o input do user
+  listInput <- get_input
 
   -- Calculando quantos acertos parciais e totais foram feitos
   let fullHits = length (filter (True==) (zipWith (==) listPassword listInput))
@@ -48,26 +47,29 @@ game listPassword counter = do
 
 
 -- Função para pegar o input do usuário
-get_input :: IO (String)
+get_input :: IO ([Int])
 get_input = do
     putStr "? "
     input <- getLine
-    return input
+    let listInput = map read $ words input
+    flag <- validate_input listInput
+    if flag == 1 then get_input else return listInput
 
 
--- Funções para pegar valores individuais da senha
-first_elt (x:xs) = x
-second_elt (x:x2:xs) = x2
-third_elt (x:x2:x3:xs) = x3
-forth_elt (x:x2:x3:x4:xs) = x4
+-- Função para validar o input do usuário
+validate_input listInput = do
+  if length listInput /= 4 then (putStrLn "A senha inserida não contém quatro dígitos. \n" >> return 1) else return 0
+  if length (filter (<1) listInput) > 0 then (putStrLn "A senha inserida contém valores fora do intervalo [1, 6]. \n" >> return 1) else return 0
+  if length (filter (>6) listInput) > 0 then (putStrLn "A senha inserida contém valores fora do intervalo [1, 6]. \n" >> return 1) else return 0
 
 
+-- Função para auxiliar no cálculo dos acertos parciais
 get_partial_hits :: [Int] -> [Int] -> IO Int
 get_partial_hits password input = do
-  let aux1 = remove_elt (first_elt input) password
-  let aux2 = remove_elt (second_elt input) aux1
-  let aux3 = remove_elt (third_elt input) aux2
-  let aux4 = remove_elt (forth_elt input) aux3
+  let aux1 = remove_elt (input !! 0) password
+  let aux2 = remove_elt (input !! 1) aux1
+  let aux3 = remove_elt (input !! 2) aux2
+  let aux4 = remove_elt (input !! 3) aux3
   return (length aux4)
 
 
